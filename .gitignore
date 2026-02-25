@@ -1,5 +1,5 @@
 .env
-MailingLists/AsdaEmails - DO SEND EMAILS TO JUST FOR TESTING.csv
+MailingLists/AsdaEmails - DON'T SEND EMAILS TO JUST FOR TESTING.csv
 MailingLists/test1.csv
 MailingLists/TestEmails.csv
 settings.json

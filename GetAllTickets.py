@@ -35,6 +35,7 @@ class GetAllTickets:
             "requester": ticket.get("requester"),
             "created_at": ticket.get("created_at"),
             "updated_at": ticket.get("updated_at"),
+            "emailConfigID": ticket.get("email_config_id"),
             "install": "False"
         })
 

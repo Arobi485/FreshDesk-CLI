@@ -10,6 +10,7 @@ import sys
 import csv
 import os
 import json
+from dotenv import set_key, find_dotenv, load_dotenv
 
 from InquirerPy import inquirer
 from InquirerPy.separator import Separator
@@ -145,7 +146,7 @@ def getInstalls(amount):
         print (f"ID: {ticket.get("id")}")
 
 #Send single email to client     
-def sendSingleEmail(emailConfigID):
+def sendSingleEmail(pointer, emailConfigID):
     se = SendOutEmail()
 
     with open("MailingLists/EmailTemplate.html", encoding="utf-8") as f:
@@ -195,25 +196,43 @@ def sendSingleEmail(emailConfigID):
 
     answers["body"] = str(answers["body"]).replace("\n","<br/>")
 
-    # Safely coerce to string for strip (silences Pylance & avoids None issues)
     html = html.replace("{greeting}", str(answers["greeting"]).strip())
     html = html.replace("{mainBody}", str(answers["body"]).strip())
     html = html.replace("{signoff}", str(answers["signoff"]).strip())
     html = html.replace("{name}", str(answers["name"]).strip())
 
-    se.sendEmail(
-        to_email=str(answers["destination"]).strip(),
-        subject=str(answers["subject"]).strip(),
-        body_html=html,
-        email_config_id=emailConfigID,
-        cc_emails=None,
-        bcc_emails=None,
-        status=5,
-        priority=1,
-        tags=["FreshdeskCLI"],
-    )
+    print(f"\nConfirm? Send email to {str(answers["destination"]).strip()}")
 
-    print(f"\nEmail sent succesfully to: {str(answers["destination"]).strip()}\n")
+    choice = inquirer.select(
+            message="Send email?:",
+            choices=[
+                "Yes",
+                "No"
+            ],
+            pointer=pointer,
+            qmark="",
+            instruction="Use ↑↓ arrow keys to move and ⏎ to select choice",
+            cycle=True,
+        ).execute()
+
+    if choice == "Yes":
+        se.sendEmail(
+            to_email=str(answers["destination"]).strip(),
+            subject=str(answers["subject"]).strip(),
+            body_html=html,
+            email_config_id=emailConfigID,
+            cc_emails=None,
+            bcc_emails=None,
+            status=5,
+            priority=1,
+            tags=["FreshdeskCLI"],
+        )
+
+        print(f"\nEmail sent succesfully to: {str(answers["destination"]).strip()}\n")
+    else:
+        print(f"\nEmail send cancelled, returning to menu\n")
+
+    time.sleep(1)
 
 #Gets a list of the mailing lists and allows you to look inside them 2
 def getMailingList(pointer):
@@ -396,19 +415,39 @@ def sendToMailingList(pointer, emailConfigID, bccEmail):
     html = html.replace("{signoff}", str(answers["signoff"]).strip())
     html = html.replace("{name}", str(answers["name"]).strip())
 
-    result = se.sendEmail(
-        to_email=bccEmail,
-        subject=(str(answers["subject"]).strip() + " - NO REPLY") ,
-        body_html=html,
-        email_config_id=emailConfigID,
-        cc_emails=None,
-        bcc_emails=singleEmailList,
-        status=5,
-        priority=1,
-        tags=["FreshdeskCLI"],
-    )
+    print(f"\nConfirm? Send email to {len(singleEmailList)} clients?")
 
-    print(f"\n{result}\n")
+    choice = inquirer.select(
+            message="Send emails?:",
+            choices=[
+                "Yes",
+                "No"
+            ],
+            pointer=pointer,
+            qmark="",
+            instruction="Use ↑↓ arrow keys to move and ⏎ to select choice",
+            cycle=True,
+        ).execute()
+
+    if choice == "Yes":
+        result = se.sendEmail(
+            to_email=bccEmail,
+            subject=(str(answers["subject"]).strip() + " - NO REPLY") ,
+            body_html=html,
+            email_config_id=emailConfigID,
+            cc_emails=None,
+            bcc_emails=singleEmailList,
+            status=5,
+            priority=1,
+            tags=["FreshdeskCLI"],
+        )
+
+        print(f"\nSent email to {len(singleEmailList)} clients\n")
+
+    else:
+        print(f"\nEmail send cancelled, returning to menu\n")
+
+    time.sleep(1)
 
 #Install time loop 2
 def getInstallationTimes(pointer):
@@ -454,33 +493,128 @@ def setPointer():
 
     response = prompt(questions)
 
-    with open("settings.json", "r") as f:
+    with open("settings.json", "r", encoding="utf-8") as f:
         settings = json.load(f)
 
     settings["pointer"] = str(response["newPointer"])
 
-    with open("settings.json", "w") as f:
+    with open("settings.json", "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=4)
 
     print("New pointer set, will take effect at next restart\n")
 
 #Toggle startup animation
 def toggleStartup():
-    with open("settings.json", "r") as f:
+    with open("settings.json", "r", encoding="utf-8") as f:
         settings = json.load(f)
 
     settings["startup"] = not settings["startup"]
 
     temp = settings["startup"]
 
-    with open("settings.json", "w") as f:
+    with open("settings.json", "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=4)
 
     print(f"Startup animation toggle changed to {temp}\n")
 
 #Change the environment variables so that you can actually use the system
 def changeEnv():
-    pass
+    load_dotenv()
+
+    api_key = os.getenv("FRESHDESK_API_KEY")
+    domain = os.getenv("FRESHDESK_DOMAIN")
+
+    questions = [
+        {
+            "type": "input",
+            "name": "newAPIKey",
+            "message": "Please enter the new FRESHDESK_API_KEY:",
+            "default": api_key,
+        },
+        {
+            "type": "input",
+            "name": "newDomain",
+            "message": "Please enter the new FRESHDESK_DOMAIN:",
+            "default": domain,
+        }
+    ]
+
+    response = prompt(questions)
+
+    env_path = find_dotenv(usecwd=True)
+    if not env_path:
+        env_path = ".env"
+        open(env_path, "a").close()
+
+    set_key(env_path, "FRESHDESK_API_KEY", str(response["newAPIKey"]).strip())
+    set_key(env_path, "FRESHDESK_DOMAIN", str(response["newDomain"]).strip())
+
+    print("\nEnvironment variables updated, no restart required\n")
+
+#Change the email config ID
+def changeEmailConfigID():
+    questions = [
+        {
+            "type": "input",
+            "name": "newEmailID",
+            "message": "Please enter the new email ID (Or type 0 to automatically find the email config, will only work if .env api+domain set):",
+            "default": "",
+        }
+    ]
+
+    response = prompt(questions)
+
+    if str(response["newEmailID"]) != "0":
+        with open("settings.json", "r", encoding="utf-8") as f:
+            settings = json.load(f)
+
+        settings["emailConfigID"] = str(response["newEmailID"])
+
+        with open("settings.json", "w", encoding="utf-8") as f:
+            json.dump(settings, f, indent=4)
+    else:
+        gat = GetAllTickets()
+
+        tickets = gat.getOpenTickets(False)
+
+        if tickets:
+            emailConfigID = tickets[0].get("emailConfigID")
+
+            with open("settings.json", "r", encoding="utf-8") as f:
+                settings = json.load(f)
+
+            settings["emailConfigID"] = emailConfigID
+
+            with open("settings.json", "w", encoding="utf-8") as f:
+                json.dump(settings, f, indent=4)
+        else:
+            print("\nNo tickets currently in your inbox, please send one and retry\n")
+            return
+
+    print("New email ID set, will take effect at next restart\n")
+
+#Change the target BCC email
+def changeBccEmail():
+    questions = [
+        {
+            "type": "input",
+            "name": "newBccEmail",
+            "message": "Please enter the new email ID:",
+            "default": "",
+        }
+    ]
+
+    response = prompt(questions)
+
+    with open("settings.json", "r", encoding="utf-8") as f:
+        settings = json.load(f)
+
+    settings["bccEmail"] = str(response["newBccEmail"])
+
+    with open("settings.json", "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=4)
+
+    print("New BCC email set, will take effect at next restart\n")
 
 #Ticket menu loop 1
 def ticketMenu(pointer):
@@ -543,7 +677,7 @@ def emailMenu(pointer, emailConfigID, bccEmail):
                 return
             case "1":
                 time.sleep(1)
-                sendSingleEmail(emailConfigID)
+                sendSingleEmail(pointer, emailConfigID)
             case "2":
                 time.sleep(1)
                 getMailingList(pointer)
@@ -556,7 +690,6 @@ def emailMenu(pointer, emailConfigID, bccEmail):
 
 #Settings menu loop 1
 def settingsMenu(pointer):
-    pass
     while True:
         choice = inquirer.select(
             message="Settings Menu:",
@@ -565,8 +698,9 @@ def settingsMenu(pointer):
                 Separator(),
                 "1) Change menu pointer",
                 "2) Startup animation toggle",
-                "3) Email config ID",
-                "4) Inbox to send mailing list BCC to",
+                "3) .env file editting",
+                "4) Change email config ID",
+                "5) Change inbox to send mailing list BCC to",
                 Separator(),
             ],
             pointer=pointer,
@@ -589,6 +723,12 @@ def settingsMenu(pointer):
             case "3":
                 time.sleep(1)
                 changeEnv()
+            case "4":
+                time.sleep(1)
+                changeEmailConfigID()
+            case "5":
+                time.sleep(1)
+                changeBccEmail()
 
 #Main Entry 0
 def main():
@@ -665,9 +805,8 @@ def main():
                 "1) Ticket reading",
                 "2) Email sending",
                 "3) Contact management",
-                "4) Survey management",
                 Separator(),
-                "5) Settings",
+                "4) Settings",
             ],
             pointer=pointer,
             qmark="",
@@ -690,10 +829,7 @@ def main():
             case "3":
                 print("Not yet implemented\n")
                 time.sleep(1)
-            case "4":
-                print("Not yet implemented\n")
-                time.sleep(1)
-            case "5":            
+            case "4":            
                 time.sleep(1)
                 settingsMenu(pointer)
 
