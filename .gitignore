@@ -1,0 +1,12 @@
+.env
+MailingLists/AsdaEmails - DO SEND EMAILS TO JUST FOR TESTING.csv
+MailingLists/test1.csv
+MailingLists/TestEmails.csv
+settings.json
+.vscode/launch.json
+MailingLists/EmailTemplate.html
+__pycache__/GetAllTickets.cpython-313.pyc
+__pycache__/GetContactInfo.cpython-313.pyc
+__pycache__/GetSingleTicket.cpython-313.pyc
+__pycache__/GetTicketTimes.cpython-313.pyc
+__pycache__/SendOutEmail.cpython-313.pyc
