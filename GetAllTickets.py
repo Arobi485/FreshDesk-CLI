@@ -70,11 +70,11 @@ class GetAllTickets:
                     if ticket.get("status") == 2:
                         self.addToTicket(ticket, extracted_tickets)
                 else:
-                    if (ticket.get("subject"))[:7].lower() == "install":
-                        self.addToTicket(ticket, extracted_tickets)
+                    self.addToTicket(ticket, extracted_tickets)
 
             page += 1
 
         extracted_tickets.sort(key=lambda t: t["updated_at"], reverse=True)
 
         return extracted_tickets
+        
