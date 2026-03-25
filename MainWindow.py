@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QHBoxLayout,
-    QLabel, QListView, QMainWindow, QMenuBar,
-    QPushButton, QSizePolicy, QStatusBar, QTabWidget,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFrame,
+    QHBoxLayout, QLabel, QListView, QMainWindow,
+    QPushButton, QSizePolicy, QSplitter, QStatusBar,
+    QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_HelloWorldUI(object):
     def setupUi(self, HelloWorldUI):
@@ -27,12 +27,27 @@ class Ui_HelloWorldUI(object):
         HelloWorldUI.resize(800, 600)
         self.centralwidget = QWidget(HelloWorldUI)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.pushButton_Settings = QPushButton(self.centralwidget)
-        self.pushButton_Settings.setObjectName(u"pushButton_Settings")
-        self.pushButton_Settings.setGeometry(QRect(720, 10, 61, 61))
-        self.label_MainTitle = QLabel(self.centralwidget)
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.splitter = QSplitter(self.centralwidget)
+        self.splitter.setObjectName(u"splitter")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(100)
+        sizePolicy.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
+        self.splitter.setSizePolicy(sizePolicy)
+        self.splitter.setBaseSize(QSize(0, 100))
+        self.splitter.setFrameShadow(QFrame.Shadow.Sunken)
+        self.splitter.setLineWidth(1)
+        self.splitter.setOrientation(Qt.Orientation.Horizontal)
+        self.splitter.setHandleWidth(5)
+        self.label_MainTitle = QLabel(self.splitter)
         self.label_MainTitle.setObjectName(u"label_MainTitle")
-        self.label_MainTitle.setGeometry(QRect(20, 10, 691, 61))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(10)
+        sizePolicy1.setVerticalStretch(10)
+        sizePolicy1.setHeightForWidth(self.label_MainTitle.sizePolicy().hasHeightForWidth())
+        self.label_MainTitle.setSizePolicy(sizePolicy1)
         palette = QPalette()
         brush = QBrush(QColor(0, 0, 0, 255))
         brush.setStyle(Qt.BrushStyle.SolidPattern)
@@ -119,19 +134,31 @@ class Ui_HelloWorldUI(object):
 #endif
         self.label_MainTitle.setPalette(palette)
         self.label_MainTitle.setAutoFillBackground(True)
+        self.splitter.addWidget(self.label_MainTitle)
+        self.pushButton_Settings = QPushButton(self.splitter)
+        self.pushButton_Settings.setObjectName(u"pushButton_Settings")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Maximum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.pushButton_Settings.sizePolicy().hasHeightForWidth())
+        self.pushButton_Settings.setSizePolicy(sizePolicy2)
+        self.splitter.addWidget(self.pushButton_Settings)
+
+        self.verticalLayout.addWidget(self.splitter)
+
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
-        self.tabWidget.setGeometry(QRect(20, 80, 761, 501))
         self.Tickets = QWidget()
         self.Tickets.setObjectName(u"Tickets")
-        self.layoutWidget = QWidget(self.Tickets)
-        self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(10, 10, 731, 431))
-        self.verticalLayout_Tickets = QVBoxLayout(self.layoutWidget)
-        self.verticalLayout_Tickets.setObjectName(u"verticalLayout_Tickets")
-        self.verticalLayout_Tickets.setContentsMargins(0, 0, 0, 0)
-        self.label_TicketInbox = QLabel(self.layoutWidget)
+        self.verticalLayout_3 = QVBoxLayout(self.Tickets)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.label_TicketInbox = QLabel(self.Tickets)
         self.label_TicketInbox.setObjectName(u"label_TicketInbox")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(5)
+        sizePolicy3.setHeightForWidth(self.label_TicketInbox.sizePolicy().hasHeightForWidth())
+        self.label_TicketInbox.setSizePolicy(sizePolicy3)
         palette1 = QPalette()
         palette1.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.WindowText, brush)
         palette1.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.Button, brush1)
@@ -199,63 +226,73 @@ class Ui_HelloWorldUI(object):
         self.label_TicketInbox.setPalette(palette1)
         self.label_TicketInbox.setAutoFillBackground(True)
 
-        self.verticalLayout_Tickets.addWidget(self.label_TicketInbox)
+        self.verticalLayout_3.addWidget(self.label_TicketInbox)
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.listView_TicketList = QListView(self.layoutWidget)
+        self.listView_TicketList = QListView(self.Tickets)
         self.listView_TicketList.setObjectName(u"listView_TicketList")
         self.listView_TicketList.setEnabled(True)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(3)
+        sizePolicy4.setHeightForWidth(self.listView_TicketList.sizePolicy().hasHeightForWidth())
+        self.listView_TicketList.setSizePolicy(sizePolicy4)
+        self.listView_TicketList.setBaseSize(QSize(0, 60))
         self.listView_TicketList.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.listView_TicketList.setResizeMode(QListView.ResizeMode.Adjust)
+        self.listView_TicketList.setWordWrap(True)
 
         self.horizontalLayout.addWidget(self.listView_TicketList)
 
-        self.verticalLayout_Tickets_2 = QVBoxLayout()
-        self.verticalLayout_Tickets_2.setSpacing(6)
-        self.verticalLayout_Tickets_2.setObjectName(u"verticalLayout_Tickets_2")
-        self.pushButton_UpdateTickets = QPushButton(self.layoutWidget)
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.pushButton_UpdateTickets = QPushButton(self.Tickets)
         self.pushButton_UpdateTickets.setObjectName(u"pushButton_UpdateTickets")
 
-        self.verticalLayout_Tickets_2.addWidget(self.pushButton_UpdateTickets)
+        self.verticalLayout_2.addWidget(self.pushButton_UpdateTickets)
 
-        self.comboBox_TicketState = QComboBox(self.layoutWidget)
+        self.comboBox_TicketState = QComboBox(self.Tickets)
         self.comboBox_TicketState.addItem("")
         self.comboBox_TicketState.addItem("")
         self.comboBox_TicketState.setObjectName(u"comboBox_TicketState")
 
-        self.verticalLayout_Tickets_2.addWidget(self.comboBox_TicketState)
+        self.verticalLayout_2.addWidget(self.comboBox_TicketState)
 
-        self.pushButton_ReadTicket = QPushButton(self.layoutWidget)
+        self.pushButton_ReadTicket = QPushButton(self.Tickets)
         self.pushButton_ReadTicket.setObjectName(u"pushButton_ReadTicket")
 
-        self.verticalLayout_Tickets_2.addWidget(self.pushButton_ReadTicket)
+        self.verticalLayout_2.addWidget(self.pushButton_ReadTicket)
 
-        self.pushButton_CloseTicket = QPushButton(self.layoutWidget)
-        self.pushButton_CloseTicket.setObjectName(u"pushButton_CloseTicket")
-
-        self.verticalLayout_Tickets_2.addWidget(self.pushButton_CloseTicket)
-
-        self.pushButton_RespondTicket = QPushButton(self.layoutWidget)
+        self.pushButton_RespondTicket = QPushButton(self.Tickets)
         self.pushButton_RespondTicket.setObjectName(u"pushButton_RespondTicket")
 
-        self.verticalLayout_Tickets_2.addWidget(self.pushButton_RespondTicket)
+        self.verticalLayout_2.addWidget(self.pushButton_RespondTicket)
+
+        self.pushButton_CloseTicket = QPushButton(self.Tickets)
+        self.pushButton_CloseTicket.setObjectName(u"pushButton_CloseTicket")
+
+        self.verticalLayout_2.addWidget(self.pushButton_CloseTicket)
 
 
-        self.horizontalLayout.addLayout(self.verticalLayout_Tickets_2)
+        self.horizontalLayout.addLayout(self.verticalLayout_2)
 
+        self.horizontalLayout.setStretch(0, 6)
+        self.horizontalLayout.setStretch(1, 1)
 
-        self.verticalLayout_Tickets.addLayout(self.horizontalLayout)
+        self.verticalLayout_3.addLayout(self.horizontalLayout)
 
+        self.verticalLayout_3.setStretch(1, 60)
         self.tabWidget.addTab(self.Tickets, "")
         self.Emails = QWidget()
         self.Emails.setObjectName(u"Emails")
-        self.layoutWidget1 = QWidget(self.Emails)
-        self.layoutWidget1.setObjectName(u"layoutWidget1")
-        self.layoutWidget1.setGeometry(QRect(10, 10, 731, 431))
-        self.verticalLayout_Emails = QVBoxLayout(self.layoutWidget1)
+        self.layoutWidget = QWidget(self.Emails)
+        self.layoutWidget.setObjectName(u"layoutWidget")
+        self.layoutWidget.setGeometry(QRect(10, 10, 731, 431))
+        self.verticalLayout_Emails = QVBoxLayout(self.layoutWidget)
         self.verticalLayout_Emails.setObjectName(u"verticalLayout_Emails")
         self.verticalLayout_Emails.setContentsMargins(0, 0, 0, 0)
-        self.label_3 = QLabel(self.layoutWidget1)
+        self.label_3 = QLabel(self.layoutWidget)
         self.label_3.setObjectName(u"label_3")
         palette2 = QPalette()
         palette2.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.WindowText, brush)
@@ -326,17 +363,16 @@ class Ui_HelloWorldUI(object):
 
         self.verticalLayout_Emails.addWidget(self.label_3)
 
-        self.listView_Emails = QListView(self.layoutWidget1)
+        self.listView_Emails = QListView(self.layoutWidget)
         self.listView_Emails.setObjectName(u"listView_Emails")
 
         self.verticalLayout_Emails.addWidget(self.listView_Emails)
 
         self.tabWidget.addTab(self.Emails, "")
+
+        self.verticalLayout.addWidget(self.tabWidget)
+
         HelloWorldUI.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(HelloWorldUI)
-        self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 800, 22))
-        HelloWorldUI.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(HelloWorldUI)
         self.statusbar.setObjectName(u"statusbar")
         HelloWorldUI.setStatusBar(self.statusbar)
@@ -351,7 +387,6 @@ class Ui_HelloWorldUI(object):
 
     def retranslateUi(self, HelloWorldUI):
         HelloWorldUI.setWindowTitle(QCoreApplication.translate("HelloWorldUI", u"MainWindow", None))
-        self.pushButton_Settings.setText(QCoreApplication.translate("HelloWorldUI", u"Settings", None))
         self.label_MainTitle.setText(QCoreApplication.translate("HelloWorldUI", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -360,6 +395,7 @@ class Ui_HelloWorldUI(object):
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:16pt; color:#0252ff;\">Freshdesk GUI</span></p></body></html>", None))
+        self.pushButton_Settings.setText(QCoreApplication.translate("HelloWorldUI", u"Settings", None))
         self.label_TicketInbox.setText(QCoreApplication.translate("HelloWorldUI", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -373,8 +409,8 @@ class Ui_HelloWorldUI(object):
         self.comboBox_TicketState.setItemText(1, QCoreApplication.translate("HelloWorldUI", u"Closed", None))
 
         self.pushButton_ReadTicket.setText(QCoreApplication.translate("HelloWorldUI", u"Read Ticket", None))
-        self.pushButton_CloseTicket.setText(QCoreApplication.translate("HelloWorldUI", u"Close Ticket", None))
         self.pushButton_RespondTicket.setText(QCoreApplication.translate("HelloWorldUI", u"Respond", None))
+        self.pushButton_CloseTicket.setText(QCoreApplication.translate("HelloWorldUI", u"Close Ticket", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Tickets), QCoreApplication.translate("HelloWorldUI", u"Tab 1", None))
         self.label_3.setText(QCoreApplication.translate("HelloWorldUI", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
